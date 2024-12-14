@@ -28,18 +28,12 @@ func main() {
 		errorLog: log.New(os.Stderr, "ERROR\t", log.LUTC|log.Ldate|log.Ltime|log.Lshortfile),
 	}
 
-	mux := http.NewServeMux()
-	fileServer := http.FileServer(http.Dir(cfg.staticDir))
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/snippet/view", app.snippetView)
-	mux.HandleFunc("/snippet/create", app.snippetCreate)
-
 	app.infoLog.Printf("Starting server on %s\n", cfg.addr)
 	server := http.Server{
 		Addr:     cfg.addr,
 		ErrorLog: app.errorLog,
-		Handler:  mux}
+		Handler:  app.routes(cfg.staticDir),
+	}
 	err := server.ListenAndServe()
 	app.errorLog.Fatal(err)
 }
