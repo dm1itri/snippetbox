@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"html/template"
 	"log"
@@ -21,6 +22,7 @@ type Application struct {
 	infoLog       *log.Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -43,8 +45,9 @@ func main() {
 	flag.Parse()
 
 	app := &Application{
-		infoLog:  log.New(os.Stdout, "INFO\t", log.LUTC|log.Ldate|log.Ltime),
-		errorLog: log.New(os.Stderr, "ERROR\t", log.LUTC|log.Ldate|log.Ltime|log.Lshortfile),
+		infoLog:     log.New(os.Stdout, "INFO\t", log.LUTC|log.Ldate|log.Ltime),
+		errorLog:    log.New(os.Stderr, "ERROR\t", log.LUTC|log.Ldate|log.Ltime|log.Lshortfile),
+		formDecoder: form.NewDecoder(),
 	}
 
 	db, err := openDB(*dsn)
