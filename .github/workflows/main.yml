@@ -2,7 +2,7 @@ name: Go Test
 
 on:
   push:
-    branches: ["**"]
+    branches: [ "**" ]
 
 jobs:
   test:
@@ -15,7 +15,6 @@ jobs:
       image: mysql:latest
       env:
         MYSQL_DATABASE: snippetbox_test
-        MYSQL_USER: web_test
         MYSQL_ROOT_PASSWORD: root
       ports:
         - 3306:3306
