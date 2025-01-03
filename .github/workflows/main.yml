@@ -6,13 +6,10 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest ]
+    runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:9.0.1
+        image: mysql:8.0
         env:
           MYSQL_DATABASE: snippetbox_test
           MYSQL_ROOT_PASSWORD: root
