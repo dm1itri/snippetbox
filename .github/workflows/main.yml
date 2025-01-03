@@ -2,12 +2,11 @@ name: Go Test
 
 on:
   push:
-    branches:
-      - ["**"]
+    branches: ["**"]
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
