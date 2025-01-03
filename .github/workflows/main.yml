@@ -11,7 +11,6 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_DATABASE: snippetbox_test
           MYSQL_ROOT_PASSWORD: root
         ports:
           - 3306:3306
@@ -34,8 +33,8 @@ jobs:
         run: go mod tidy
       - name: Run SQL scripts
         run: |
-          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "CREATE DATABASE IF NOT EXISTS snippetbox_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "CREATE USER IF NOT EXISTS 'web_test';"
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "CREATE DATABASE snippetbox_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "CREATE USER 'web_test';"
           mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "GRANT CREATE, DROP, ALTER, INDEX, SELECT, INSERT, UPDATE, DELETE ON snippetbox_test.* TO 'web_test';"
           mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "ALTER USER 'web_test' IDENTIFIED BY 'pass';"
 
