@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"github.com/alexedwards/scs/mysqlstore"
@@ -70,13 +71,21 @@ func main() {
 	app.sessionManager = scs.New()
 	app.sessionManager.Store = mysqlstore.New(db)
 	app.sessionManager.Lifetime = 12 * time.Hour
+	app.sessionManager.Cookie.Secure = true
 
 	app.infoLog.Printf("Starting server on %s\n", cfg.addr)
 	server := http.Server{
 		Addr:     cfg.addr,
 		ErrorLog: app.errorLog,
 		Handler:  app.routes(cfg.staticDir),
+		TLSConfig: &tls.Config{
+			CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+			MinVersion:       tls.VersionTLS13,
+		},
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
-	err = server.ListenAndServe()
+	err = server.ListenAndServeTLS("tls/cert.pem", "tls/key.pem")
 	app.errorLog.Fatal(err)
 }
