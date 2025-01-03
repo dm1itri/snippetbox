@@ -10,7 +10,15 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest ]
-
+  services:
+    mysql:
+      image: mysql:latest
+      env:
+        MYSQL_DATABASE: snippetbox_test
+        MYSQL_USER: web_test
+        MYSQL_ROOT_PASSWORD: root
+      ports:
+        - 3306:3306
 
     steps:
       - name: Checkout code
@@ -23,6 +31,12 @@ jobs:
 
       - name: Install dependencies
         run: go mod tidy
+      - name: Run SQL scripts
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "CREATE DATABASE snippetbox_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "CREATE USER 'web_test';"
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "GRANT CREATE, DROP, ALTER, INDEX, SELECT, INSERT, UPDATE, DELETE ON snippetbox_test.* TO 'web_test';"
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "ALTER USER 'web_test' IDENTIFIED BY 'pass';"
 
       - name: Run tests
-        run: go test -v ./cmd/web
+        run: go test -v ./...
