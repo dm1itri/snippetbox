@@ -25,6 +25,7 @@ type Application struct {
 	errorLog       *log.Logger
 	infoLog        *log.Logger
 	snippets       *models.SnippetModel
+	users          *models.UserModel
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
@@ -61,6 +62,7 @@ func main() {
 	}
 	defer db.Close()
 	app.snippets = &models.SnippetModel{DB: db}
+	app.users = &models.UserModel{DB: db}
 
 	templateCache, err := newTemplateCache()
 	if err != nil {
