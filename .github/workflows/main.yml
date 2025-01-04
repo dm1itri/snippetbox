@@ -1,0 +1,44 @@
+name: Go Test
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.22'
+
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Run SQL scripts
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "CREATE DATABASE snippetbox_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "CREATE USER 'web_test';"
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "GRANT CREATE, DROP, ALTER, INDEX, SELECT, INSERT, UPDATE, DELETE ON snippetbox_test.* TO 'web_test';"
+          mysql -h 127.0.0.1 -P 3306 -u root -proot --execute "ALTER USER 'web_test' IDENTIFIED BY 'pass';"
+
+      - name: Run tests
+        run: go test -v ./...
